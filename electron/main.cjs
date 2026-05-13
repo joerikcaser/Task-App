@@ -1,62 +1,57 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('node:path');
-const { autoUpdater } = require('electron-updater');
+const { app, BrowserWindow, dialog } = require("electron");
+const path = require("path");
+const { autoUpdater } = require("electron-updater");
 
-const isDev = !app.isPackaged;
-
-let win;
+let mainWindow;
 
 function createWindow() {
-  win = new BrowserWindow({
-    width: 1024,
-    height: 720,
-    minWidth: 480,
-    minHeight: 480,
-    title: 'Task App',
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 700,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-    },
+      nodeIntegration: false
+    }
   });
 
-  if (isDev) {
-    win.loadURL('http://localhost:5173');
-    win.webContents.openDevTools({ mode: 'detach' });
+  if (!app.isPackaged) {
+    mainWindow.loadURL("http://localhost:5173");
   } else {
-    win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
-
-    // 🔄 comprobar actualizaciones SOLO en producción
-    autoUpdater.checkForUpdatesAndNotify();
+    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 }
 
 app.whenReady().then(() => {
   createWindow();
+  autoUpdater.checkForUpdatesAndNotify();
+});
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+// 📢 Update disponible
+autoUpdater.on("update-available", () => {
+  dialog.showMessageBox({
+    type: "info",
+    title: "Actualización disponible",
+    message: "Se está descargando una nueva versión."
   });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+// 📥 Update descargada
+autoUpdater.on("update-downloaded", () => {
+  dialog
+    .showMessageBox({
+      type: "info",
+      title: "Actualización lista",
+      message: "¿Reiniciar para instalarla?",
+      buttons: ["Reiniciar", "Más tarde"]
+    })
+    .then((result) => {
+      if (result.response === 0) {
+        autoUpdater.quitAndInstall();
+      }
+    });
 });
 
-autoUpdater.on('update-available', () => {
-  if (win) {
-    win.webContents.send('update_available');
-  }
-});
-
-autoUpdater.on('update-downloaded', () => {
-  if (win) {
-    win.webContents.send('update_ready');
-  }
-});
-
-
-ipcMain.on('restart_app', () => {
-  autoUpdater.quitAndInstall();
+// ❌ Error
+autoUpdater.on("error", (err) => {
+  console.log("Updater error:", err);
 });

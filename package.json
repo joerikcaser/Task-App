@@ -1,121 +1,94 @@
 {
   "name": "task-app",
   "description": "Task App",
-  "author": "Joerik",
+  "author": "joerikcaser",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "electron/main.cjs",
-
   "scripts": {
     "dev": "vite",
-
     "dev:electron": "concurrently -k -n vite,electron -c blue,magenta \"npm:dev\" \"wait-on tcp:5173 && electron .\"",
-
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
-
     "publish:win": "npm run build && electron-builder --publish always"
   },
-
-  "dependencies": {},
-
+  "dependencies": {
+    "electron-updater": "^6.8.3"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-
     "concurrently": "^9.2.1",
-
     "electron": "^42.0.0",
     "electron-builder": "^26.8.1",
-
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
-
     "globals": "^17.5.0",
-
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-
     "vite": "^8.0.10",
-    "wait-on": "^9.0.5"
-  },
+    "wait-on": "^9.0.5",
+    "electron-updater": "^6.6.2"
 
+  },
   "build": {
     "appId": "com.tuempresa.taskapp",
     "productName": "Task App",
-
     "asar": true,
     "compression": "maximum",
-
     "electronLanguages": [
       "en-US",
       "es"
     ],
-
     "files": [
       "dist/**/*",
       "electron/**/*",
       "package.json",
-
       "!**/*.{md,map,d.ts,ts,tsx}",
       "!/{LICENSE,CHANGELOG.md,README.md}",
-
       "!/test/",
       "!/tests/",
-
       "!/.vscode/",
       "!/.idea/",
       "!/.git/",
-
       "!/src/",
       "!/public/",
-
       "!/node_modules/.cache/**"
     ],
-
     "directories": {
       "output": "release",
       "buildResources": "build"
     },
-
     "win": {
       "target": [
         "nsis-web"
       ],
       "icon": "build/icon.ico"
     },
-
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-
       "shortcutName": "Task App",
-
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
-
       "differentialPackage": false
     },
-
     "publish": {
       "provider": "github",
-      "owner": "Joerik06",
+      "owner": "joerikcaser",
       "repo": "Task-App",
       "releaseType": "release"
     }
