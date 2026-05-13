@@ -51,7 +51,12 @@ autoUpdater.on("update-downloaded", () => {
     });
 });
 
-// ❌ Error
+const log = require("electron-log");
+
+autoUpdater.logger = log;
+
+log.transports.file.level = "info";
+
 autoUpdater.on("error", (err) => {
   console.log("Updater error:", err);
 });
